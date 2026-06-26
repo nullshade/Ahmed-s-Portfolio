@@ -7,50 +7,101 @@ function runPreloader() {
   const progressText = document.getElementById("preloader-percentage");
   if (!logContainer) return;
 
-  const logs = [
-    { tag: "SYS", text: "init ahmed.profile --speedrun", type: "sys", progress: 15 },
-    { tag: "LUA", text: "Roblox API connections ready", type: "lua", progress: 35 },
-    { tag: "YT", text: "Video editing flow template loaded", type: "yt", progress: 55 },
-    { tag: "SYS", text: "Calibrating CS binary trees & logic", type: "sys", progress: 75 },
-    { tag: "OK", text: "Coffee reserves at 100% capacity", type: "ok", progress: 90 },
-    { tag: "READY", text: "Ahmed portfolio compiled successfully!", type: "ready", progress: 100 }
-  ];
+  // Clear static placeholder logs
+  logContainer.innerHTML = "";
 
-  let currentLine = 0;
+  const addLog = (tag, text, type) => {
+    const div = document.createElement("div");
+    div.className = "log-line";
+    const tagSpan = document.createElement("span");
+    tagSpan.className = `log-tag ${type}`;
+    tagSpan.textContent = tag;
+    const textSpan = document.createElement("span");
+    textSpan.className = "log-text";
+    textSpan.textContent = text;
+    div.appendChild(tagSpan);
+    div.appendChild(textSpan);
+    logContainer.appendChild(div);
+    // Auto scroll logs
+    logContainer.scrollTop = logContainer.scrollHeight;
+  };
 
-  function printNextLine() {
-    if (currentLine < logs.length) {
-      const lineData = logs[currentLine];
-      
-      const div = document.createElement("div");
-      div.className = "log-line";
-      
-      const tagSpan = document.createElement("span");
-      tagSpan.className = `log-tag ${lineData.type}`;
-      tagSpan.textContent = lineData.tag;
-      
-      const textSpan = document.createElement("span");
-      textSpan.className = "log-text";
-      textSpan.textContent = lineData.text;
-      
-      div.appendChild(tagSpan);
-      div.appendChild(textSpan);
-      logContainer.appendChild(div);
-      
-      if (progressBar) progressBar.style.width = `${lineData.progress}%`;
-      if (progressText) progressText.textContent = `${lineData.progress}%`;
-      
-      currentLine++;
-      
-      const delay = lineData.type === "sys" && currentLine === 1 ? 260 : 150;
-      setTimeout(printNextLine, delay);
-    } else {
-      setTimeout(dismissPreloader, 400);
+  const updateProgress = (pct) => {
+    if (progressBar) progressBar.style.width = `${pct}%`;
+    if (progressText) progressText.textContent = `${pct}%`;
+  };
+
+  // Immediate start
+  addLog("SYS", "init ahmed.profile --speedrun", "sys");
+  updateProgress(15);
+
+  // We define an async sequence to load real resources
+  (async () => {
+    await new Promise(r => setTimeout(r, 250));
+
+    // Load Database Content
+    addLog("SYS", "Connecting to database...", "sys");
+    updateProgress(35);
+    await new Promise(r => setTimeout(r, 200));
+
+    let dbResult;
+    try {
+      const dbTimeout = new Promise((resolve) => setTimeout(() => resolve({ success: false, source: "timeout" }), 4000));
+      dbResult = await Promise.race([loadData(), dbTimeout]);
+    } catch (e) {
+      dbResult = { success: false, source: "error" };
     }
-  }
 
-  printNextLine();
+    if (dbResult.source === "firebase" && dbResult.success) {
+      addLog("OK", "Firebase cloud content resolved successfully", "ok");
+    } else if (dbResult.source === "local") {
+      addLog("OK", "Local cached profile content loaded", "ok");
+    } else {
+      addLog("WARN", "Database timeout/offline, using fallback defaults", "lua");
+    }
+    updateProgress(60);
+    await new Promise(r => setTimeout(r, 250));
+
+    // Load Roblox Live Count
+    addLog("SYS", "Fetching Roblox live count for active games...", "sys");
+    updateProgress(75);
+    await new Promise(r => setTimeout(r, 200));
+
+    let robloxResult = null;
+    try {
+      const robloxTimeout = new Promise(resolve => setTimeout(() => resolve(null), 3500));
+      robloxResult = await Promise.race([updateRobloxLiveStats(), robloxTimeout]);
+    } catch (e) {
+      console.error("Roblox preloading fetch failed:", e);
+    }
+
+    if (robloxResult) {
+      // Find Driving Simulator in the stats results to log
+      const mainGameStats = robloxResult["14875626099"];
+      if (mainGameStats) {
+        addLog("OK", `Roblox stats resolved: ${mainGameStats.playing} playing!`, "ready");
+      } else {
+        addLog("OK", "Roblox live stats resolved successfully", "ready");
+      }
+    } else {
+      addLog("WARN", "Roblox API offline/timeout, showing offline values", "lua");
+    }
+    updateProgress(90);
+    await new Promise(r => setTimeout(r, 250));
+
+    // Start background interval for live refreshes (every 25 seconds for a true LIVE experience)
+    if (robloxInterval) clearInterval(robloxInterval);
+    robloxInterval = setInterval(updateRobloxLiveStats, 25000);
+
+    // Final compile
+    addLog("READY", "Ahmed portfolio compiled successfully!", "ready");
+    updateProgress(100);
+    await new Promise(r => setTimeout(r, 450));
+
+    dismissPreloader();
+  })();
 }
+
 
 function dismissPreloader() {
   const preloader = document.getElementById("terminal-preloader");
@@ -111,9 +162,9 @@ const DEFAULT_PORTFOLIO_DATA = {
     { title: "Computer Science Student", desc: "Studying Computer Science in the 2nd year and building foundations in programming and problem-solving." }
   ],
   works: [
-    { title: "Driving Simulator", desc: "A Roblox game project shaped around scripting-driven interaction and playful systems.", url: "https://www.roblox.com/games/14875626099/driving-simulator", category: "roblox", imgClass: "image-one" },
-    { title: "Grow Your Leg", desc: "A playful Roblox experience built around a memorable concept and quick progression.", url: "https://www.roblox.com/games/106419822021709/Grow-Your-Leg", category: "roblox", imgClass: "image-two" },
-    { title: "YouTube @t.i1", desc: "Ahmed's YouTube channel for creator-led videos, edits, and content experiments.", url: "https://www.youtube.com/@t.i1", category: "content", imgClass: "image-three" }
+    { title: "Driving Simulator", desc: "A Roblox game project shaped around scripting-driven interaction and playful systems.", url: "https://www.roblox.com/games/14875626099/driving-simulator", category: "roblox", imgClass: "image-one", isOwnGame: true, showActive: true },
+    { title: "Grow Your Leg", desc: "A playful Roblox experience built around a memorable concept and quick progression.", url: "https://www.roblox.com/games/106419822021709/Grow-Your-Leg", category: "roblox", imgClass: "image-two", isOwnGame: false, showActive: true },
+    { title: "YouTube @t.i1", desc: "Ahmed's YouTube channel for creator-led videos, edits, and content experiments.", url: "https://www.youtube.com/@t.i1", category: "content", imgClass: "image-three", isOwnGame: false, showActive: false }
   ],
   links: [
     { title: "YouTube @t.i1", url: "https://www.youtube.com/@t.i1", icon: "fa-brands fa-youtube", subtitle: "" },
@@ -705,7 +756,16 @@ function renderPortfolio(data) {
     workGrid.innerHTML = "";
     (data.works || []).forEach(item => {
       const article = document.createElement("article");
-      article.className = "work-card reveal";
+      
+      const isOwn = !!item.isOwnGame;
+      const showActive = !!item.showActive;
+      const placeId = extractPlaceId(item.url);
+      
+      if (isOwn) {
+        article.className = "work-card reveal featured-work";
+      } else {
+        article.className = "work-card reveal";
+      }
       article.setAttribute("data-category", item.category);
       
       let imgStyle = "";
@@ -715,10 +775,34 @@ function renderPortfolio(data) {
         imgStyle = `class="work-image ${item.imgClass}"`;
       }
       
+      let badgeHTML = "";
+      if (isOwn || (showActive && placeId)) {
+        badgeHTML += `<div class="card-badge-container">`;
+        if (isOwn) {
+          badgeHTML += `<span class="badge badge-own">⭐ MY GAME</span>`;
+        }
+        if (showActive && placeId) {
+          badgeHTML += `
+            <span class="badge badge-live">
+              <span class="live-dot"></span>
+              <span id="roblox-live-players-${placeId}" class="live-count-text">Loading...</span>
+            </span>
+          `;
+        }
+        badgeHTML += `</div>`;
+      }
+      
+      let titleHTML = item.title;
+      if (isOwn) {
+        titleHTML = `${item.title} <span class="title-sparkle" title="My Featured Game">✨</span>`;
+      }
+      
       article.innerHTML = `
-        <div ${imgStyle} role="img" aria-label="${item.title} screenshot"></div>
+        <div ${imgStyle} role="img" aria-label="${item.title} screenshot">
+          ${badgeHTML}
+        </div>
         <div class="work-body">
-          <h3>${item.title}</h3>
+          <h3>${titleHTML}</h3>
           <p>${item.desc}</p>
           <a class="button" href="${item.url}" target="_blank" rel="noreferrer">View</a>
         </div>
@@ -813,37 +897,235 @@ function renderPortfolio(data) {
   if (typeof addHoverListeners === "function") {
     addHoverListeners();
   }
+
+  // Fetch Roblox Live Counts immediately whenever portfolio is rendered
+  if (typeof updateRobloxLiveStats === "function") {
+    updateRobloxLiveStats().catch(err => console.warn("Roblox stats render update failed:", err));
+  }
 }
 
 // Database Loading Logic
+// Database Loading Logic
 function loadData() {
-  if (useFirebase && db) {
-    db.collection("portfolio").doc("content").get()
-      .then((doc) => {
-        if (doc.exists) {
-          const fetchedData = doc.data();
-          currentPortfolioData = { ...DEFAULT_PORTFOLIO_DATA, ...fetchedData };
-          renderPortfolio(currentPortfolioData);
-        } else {
+  return new Promise((resolve) => {
+    if (useFirebase && db) {
+      db.collection("portfolio").doc("content").get()
+        .then((doc) => {
+          if (doc.exists) {
+            const fetchedData = doc.data();
+            currentPortfolioData = { ...DEFAULT_PORTFOLIO_DATA, ...fetchedData };
+            renderPortfolio(currentPortfolioData);
+            resolve({ success: true, source: "firebase" });
+          } else {
+            renderPortfolio(DEFAULT_PORTFOLIO_DATA);
+            resolve({ success: true, source: "fallback" });
+          }
+        })
+        .catch((err) => {
+          console.error("Error fetching database documents, falling back to local defaults:", err);
           renderPortfolio(DEFAULT_PORTFOLIO_DATA);
+          resolve({ success: false, source: "fallback", error: err });
+        });
+    } else {
+      // Local fallback check
+      const localData = localStorage.getItem("portfolio_fallback_data");
+      if (localData) {
+        try {
+          currentPortfolioData = { ...DEFAULT_PORTFOLIO_DATA, ...JSON.parse(localData) };
+        } catch (e) {
+          console.error("Error reading localStorage:", e);
         }
-      })
-      .catch((err) => {
-        console.error("Error fetching database documents, falling back to local defaults:", err);
-        renderPortfolio(DEFAULT_PORTFOLIO_DATA);
-      });
-  } else {
-    // Local fallback check
-    const localData = localStorage.getItem("portfolio_fallback_data");
-    if (localData) {
-      try {
-        currentPortfolioData = { ...DEFAULT_PORTFOLIO_DATA, ...JSON.parse(localData) };
-      } catch (e) {
-        console.error("Error reading localStorage:", e);
       }
+      renderPortfolio(currentPortfolioData);
+      resolve({ success: true, source: "local" });
     }
-    renderPortfolio(currentPortfolioData);
+  });
+}
+
+// ==========================================================================
+// Roblox Live Player Count Fetcher & Visits Sync (General, multi-game support)
+// ==========================================================================
+const KNOWN_ROBLOX_GAMES = {
+  "14875626099": "5125369493", // Driving Simulator
+  "106419822021709": "9509768227" // Grow Your Leg
+};
+
+let resolvedUniverseCache = { ...KNOWN_ROBLOX_GAMES };
+let robloxInterval = null;
+let lastPlayerCounts = {};
+
+function extractPlaceId(url) {
+  if (!url) return null;
+  const match = url.match(/\/games\/(\d+)/) || url.match(/\/place\/(\d+)/);
+  return match ? match[1] : null;
+}
+
+// Animate numbers dynamically to show a lively live load
+function animateValue(obj, start, end, duration) {
+  let startTimestamp = null;
+  const step = (timestamp) => {
+    if (!startTimestamp) startTimestamp = timestamp;
+    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+    const currentValue = Math.floor(progress * (end - start) + start);
+    obj.textContent = `${currentValue.toLocaleString()} playing`;
+    if (progress < 1) {
+      window.requestAnimationFrame(step);
+    }
+  };
+  window.requestAnimationFrame(step);
+}
+
+async function fetchRobloxLiveCounts(works) {
+  const activeWorks = (works || []).filter(w => w.category === "roblox" && w.showActive);
+  if (activeWorks.length === 0) return null;
+
+  const proxy = "https://api.allorigins.win/raw?url=";
+  const proxy2 = "https://corsproxy.io/?url=";
+  
+  // Resolve all Universe IDs in parallel
+  const resolvePromises = activeWorks.map(async (work) => {
+    const placeId = extractPlaceId(work.url);
+    if (!placeId) return null;
+    
+    if (resolvedUniverseCache[placeId]) {
+      return { placeId, universeId: resolvedUniverseCache[placeId], work };
+    }
+    
+    // Dynamic resolve
+    const universeUrl = `https://apis.roblox.com/universes/v1/places/${placeId}/universe`;
+    try {
+      const uRes = await fetch(`${proxy}${encodeURIComponent(universeUrl)}`);
+      if (uRes.ok) {
+        const uData = await uRes.json();
+        if (uData && uData.universeId) {
+          resolvedUniverseCache[placeId] = uData.universeId.toString();
+          return { placeId, universeId: uData.universeId.toString(), work };
+        }
+      }
+    } catch (e) {
+      console.warn(`AllOrigins failed resolving place ${placeId}, trying CorsProxy`, e);
+    }
+    
+    try {
+      const uRes = await fetch(`${proxy2}${encodeURIComponent(universeUrl)}`);
+      if (uRes.ok) {
+        const uData = await uRes.json();
+        if (uData && uData.universeId) {
+          resolvedUniverseCache[placeId] = uData.universeId.toString();
+          return { placeId, universeId: uData.universeId.toString(), work };
+        }
+      }
+    } catch (e) {
+      console.error(`Failed to resolve universe ID for place ${placeId}`, e);
+    }
+    
+    return null;
+  });
+
+  const resolvedItems = (await Promise.all(resolvePromises)).filter(Boolean);
+  if (resolvedItems.length === 0) return null;
+
+  const universeIds = resolvedItems.map(item => item.universeId).join(",");
+  const gamesUrl = `https://games.roblox.com/v1/games?universeIds=${universeIds}`;
+  
+  let gamesData = null;
+  
+  // Fetch details from Roblox
+  try {
+    const gRes = await fetch(`${proxy}${encodeURIComponent(gamesUrl)}`);
+    if (gRes.ok) {
+      gamesData = await gRes.json();
+    }
+  } catch (e) {
+    console.warn("AllOrigins failed fetching games data, trying CorsProxy", e);
   }
+
+  if (!gamesData) {
+    try {
+      const gRes = await fetch(`${proxy2}${encodeURIComponent(gamesUrl)}`);
+      if (gRes.ok) {
+        gamesData = await gRes.json();
+      }
+    } catch (e) {
+      console.error("Failed to fetch games details from Roblox", e);
+    }
+  }
+
+  if (gamesData && gamesData.data) {
+    const results = {};
+    gamesData.data.forEach(game => {
+      const uId = game.id.toString();
+      const matched = resolvedItems.find(item => item.universeId === uId);
+      if (matched) {
+        results[matched.placeId] = {
+          playing: game.playing,
+          visits: game.visits,
+          name: game.name
+        };
+      }
+    });
+    return results;
+  }
+  
+  return null;
+}
+
+function updateRobloxLiveStats() {
+  return new Promise(async (resolve) => {
+    const data = currentPortfolioData;
+    if (!data || !data.works) {
+      resolve(null);
+      return;
+    }
+    
+    const stats = await fetchRobloxLiveCounts(data.works);
+    if (!stats) {
+      resolve(null);
+      return;
+    }
+
+    data.works.forEach(work => {
+      const placeId = extractPlaceId(work.url);
+      if (!placeId || !stats[placeId]) return;
+
+      const gameStats = stats[placeId];
+      const playingCount = gameStats.playing;
+      const visitsCount = gameStats.visits;
+      
+      const labelEl = document.getElementById(`roblox-live-players-${placeId}`);
+      if (labelEl) {
+        const lastCount = lastPlayerCounts[placeId] || 0;
+        if (lastCount !== playingCount) {
+          animateValue(labelEl, lastCount, playingCount, 1000);
+          lastPlayerCounts[placeId] = playingCount;
+        } else {
+          labelEl.textContent = `${playingCount.toLocaleString()} playing`;
+        }
+        const badgeLive = labelEl.closest(".badge-live");
+        if (badgeLive) {
+          badgeLive.classList.add("active-live");
+        }
+      }
+
+      // Sync visits to stats visits counter if this is Ahmed's own featured game (Driving Simulator Place ID)
+      if (work.isOwnGame && placeId === "14875626099") {
+        const statsVisitsValue = document.querySelector(".stats-card.visits .counter");
+        if (visitsCount && statsVisitsValue) {
+          const millions = (visitsCount / 1000000).toFixed(2);
+          const statsCard = document.querySelector(".stats-card.visits");
+          if (statsCard) {
+            statsCard.setAttribute("data-target", millions);
+            const countSpan = statsCard.querySelector(".counter");
+            if (countSpan) {
+              countSpan.textContent = millions;
+            }
+          }
+        }
+      }
+    });
+
+    resolve(stats);
+  });
 }
 
 // Database Write Logic
@@ -1073,6 +1355,16 @@ function renderWorksEditor() {
           <input type="text" class="work-img-input" value="${item.imgClass}" required>
         </div>
       </div>
+      <div class="form-grid-2" style="margin-top: 10px; display: flex; gap: 20px; border-top: 1.5px dashed var(--ink); padding-top: 10px;">
+        <div class="form-group-checkbox" style="display: flex; align-items: center; gap: 8px;">
+          <input type="checkbox" class="work-owngame-input" id="own-game-${index}" ${item.isOwnGame ? "checked" : ""}>
+          <label for="own-game-${index}" style="margin: 0; cursor: pointer; font-size: 0.85rem;">Ahmed's Own Game (Featured)</label>
+        </div>
+        <div class="form-group-checkbox" style="display: flex; align-items: center; gap: 8px;">
+          <input type="checkbox" class="work-showactive-input" id="show-active-${index}" ${item.showActive ? "checked" : ""}>
+          <label for="show-active-${index}" style="margin: 0; cursor: pointer; font-size: 0.85rem;">Display Live Active Players</label>
+        </div>
+      </div>
     `;
     container.appendChild(card);
   });
@@ -1137,7 +1429,15 @@ document.getElementById("btn-add-experience").addEventListener("click", () => {
 });
 
 document.getElementById("btn-add-work").addEventListener("click", () => {
-  currentPortfolioData.works.push({ title: "New Project", desc: "Description here", url: "https://", category: "roblox", imgClass: "assets/avatar.png" });
+  currentPortfolioData.works.push({ 
+    title: "New Project", 
+    desc: "Description here", 
+    url: "https://", 
+    category: "roblox", 
+    imgClass: "assets/avatar.png",
+    isOwnGame: false,
+    showActive: false
+  });
   renderWorksEditor();
 });
 
@@ -1207,7 +1507,9 @@ document.getElementById("cms-save-btn").addEventListener("click", () => {
       desc: card.querySelector(".work-desc-input").value.trim(),
       url: card.querySelector(".work-url-input").value.trim(),
       category: card.querySelector(".work-category-input").value,
-      imgClass: card.querySelector(".work-img-input").value.trim()
+      imgClass: card.querySelector(".work-img-input").value.trim(),
+      isOwnGame: card.querySelector(".work-owngame-input").checked,
+      showActive: card.querySelector(".work-showactive-input").checked
     })),
     
     links: Array.from(document.querySelectorAll("#links-list-editor .cms-list-item-card")).map(card => ({
@@ -1657,11 +1959,13 @@ function initBackgroundDecorations() {
   window.bgCreatureInterval = setInterval(spawnCreature, 6000 + Math.random() * 4000);
 }
 
-// Initial Database Trigger
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", loadData);
-} else {
-  loadData();
+// Initial Database Trigger (Only if preloader is not present to handle loading workflow)
+if (!document.getElementById("terminal-preloader")) {
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", loadData);
+  } else {
+    loadData();
+  }
 }
 
 
