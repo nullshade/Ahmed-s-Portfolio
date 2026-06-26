@@ -1,0 +1,702 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Ahmed — 19-year-old Roblox developer, YouTube content creator, video editor, and 2nd-year Computer Science student.">
+  <title>Ahmed</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  
+  <!-- Firebase Compat SDK and Configuration -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="config.js"></script>
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="preloader-active dark-theme">
+  <!-- Background Decorations Layer -->
+  <div class="background-decorations" id="bg-decorations" aria-hidden="true"></div>
+  <!-- Terminal Preloader Boot Screen -->
+  <div class="terminal-preloader" id="terminal-preloader">
+    <div class="preloader-content">
+      <div class="preloader-header">
+        <div class="preloader-dots-container">
+          <span class="preloader-dot-red"></span>
+          <span class="preloader-dot-yellow"></span>
+          <span class="preloader-dot-green"></span>
+        </div>
+        <span class="preloader-title">ahmed.exe</span>
+      </div>
+      <div class="preloader-body">
+        <div class="preloader-logs-area" id="preloader-log"></div>
+        <div class="retro-progress-container">
+          <div class="retro-progress-label-row">
+            <span>COMPILING PROFILE DATA</span>
+            <span id="preloader-percentage">0%</span>
+          </div>
+          <div class="retro-progress-bar">
+            <div class="retro-progress-fill" id="preloader-fill"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll-progress"></div>
+  <header class="site-header">
+    <nav class="nav" aria-label="Primary navigation">
+      <a class="brand nav-link" href="#hero" aria-label="Ahmed home">
+        <img src="assets/avatar.png" alt="Ahmed logo" class="brand-avatar" id="brand-avatar">
+        <span id="brand-name">Ahmed</span>
+      </a>
+      <div class="hiring-status-badge" id="hiring-status-nav">
+        <span class="status-dot"></span>
+        <span class="status-text">Available</span>
+      </div>
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle dark theme">
+        <i class="fa-solid fa-sun"></i>
+      </button>
+      <button class="menu-toggle" type="button" aria-label="Open navigation menu" aria-expanded="false" aria-controls="nav-menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <div class="nav-menu" id="nav-menu">
+        <a class="nav-link" href="#about">About</a>
+        <a class="nav-link" href="#experience">Experience</a>
+        <a class="nav-link" href="#works">Works</a>
+        <a class="nav-link" href="#links">Links</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" id="hero" aria-labelledby="hero-title">
+      <div class="hero-grid-glow" data-grid-glow></div>
+      <div class="hero-copy reveal">
+        <p class="kicker" id="hero-kicker">19-year-old creator · Roblox scripting · CS student</p>
+        <h1 id="hero-title">Ahmed</h1>
+        <p class="tagline" id="hero-tagline">Building games & creating content with curiosity, craft, and a little chaos.</p>
+        <div class="label-row" id="hero-labels" aria-label="Ahmed roles and availability">
+          <span>Roblox Developer</span>
+          <span>Video Editor</span>
+          <span>YouTube Creator</span>
+          <span>2nd-year CS Student</span>
+        </div>
+      </div>
+      <div class="portrait-card reveal" aria-label="Ahmed avatar">
+        <img src="assets/avatar.png" alt="Ahmed avatar" class="hero-avatar-img" id="hero-avatar">
+        <p id="portrait-caption">Games, edits, scripts, study notes, repeat.</p>
+      </div>
+      <a class="scroll-cue" href="#about" aria-label="Scroll to About">Scroll</a>
+    </section>
+
+
+    <!-- Section Divider -->
+    <div class="section-divider" aria-hidden="true">
+      <span class="section-divider-line"></span>
+      <span class="section-divider-dot"></span>
+      <span class="section-divider-line"></span>
+    </div>
+
+    <section class="section about" id="about" aria-labelledby="about-title">
+      <div class="section-label reveal">About</div>
+      <div class="section-content reveal" id="about-content">
+        <h2 id="about-title">Who am I?</h2>
+        <div class="about-container">
+          <div class="about-lead-box">
+            <p class="lead" id="about-lead">Ahmed is a 19-year-old Roblox developer focused on scripting, a YouTube content creator, a video editor, and a 2nd-year Computer Science student.</p>
+          </div>
+          <div class="about-body-box">
+            <div class="about-body-tab">bio_details.txt</div>
+            <p id="about-body">He likes turning ideas into playable systems, watchable videos, and cleaner creative workflows. His work sits between logic and personality: scripting mechanics, shaping content, editing with rhythm, and learning the fundamentals that make better software possible.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section beliefs" aria-labelledby="beliefs-title">
+      <div class="section-label reveal">How I work</div>
+      <div class="belief-grid" id="belief-grid">
+        <article class="belief-card reveal">
+          <span>01</span>
+          <h2 id="beliefs-title">Make it feel fun first.</h2>
+          <p>Good gameplay starts with a simple loop that feels satisfying before it gets complicated.</p>
+        </article>
+        <article class="belief-card reveal">
+          <span>02</span>
+          <h2>Keep learning in public.</h2>
+          <p>Every script, edit, upload, and class project is a chance to get sharper.</p>
+        </article>
+        <article class="belief-card reveal">
+          <span>03</span>
+          <h2>Craft beats noise.</h2>
+          <p>Clean timing, clear systems, and thoughtful details make creative work stand out.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section experience" id="experience" aria-labelledby="experience-title">
+      <div class="section-label reveal">Experience</div>
+      <div class="section-content">
+        <h2 id="experience-title" class="reveal">What Ahmed does</h2>
+        <div class="experience-list" id="experience-list">
+          <article class="experience-item reveal">
+            <span>Roblox Scripting</span>
+            <p>Building gameplay systems, interactive mechanics, and scripted features for Roblox experiences.</p>
+          </article>
+          <article class="experience-item reveal">
+            <span>Content Creation (YouTube)</span>
+            <p>Creating videos with a clear idea, a watchable structure, and a consistent creative direction.</p>
+          </article>
+          <article class="experience-item reveal">
+            <span>Video Editing</span>
+            <p>Editing for pacing, flow, cuts, and polish so each video feels clean and energetic.</p>
+          </article>
+          <article class="experience-item reveal">
+            <span>Computer Science Student</span>
+            <p>Studying Computer Science in the 2nd year and building foundations in programming and problem-solving.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section stats" id="stats" aria-labelledby="stats-title">
+      <div class="section-label reveal">Stats</div>
+      <div class="section-content">
+        <h2 id="stats-title" class="reveal">Ahmed by the numbers.</h2>
+        <div class="stats-grid" id="stats-grid">
+          <article class="stats-card commission reveal" data-target="15">
+            <div class="stats-number"><span class="counter">0</span></div>
+            <div class="stats-desc">Roblox Commissions Finished</div>
+          </article>
+          <article class="stats-card visits reveal" data-target="3.1" data-suffix="M">
+            <div class="stats-number"><span class="counter">0</span><span class="suffix">M</span></div>
+            <div class="stats-desc">Roblox Game Visits</div>
+          </article>
+          <article class="stats-card subs reveal" data-target="34.7" data-suffix="K">
+            <div class="stats-number"><span class="counter">0</span><span class="suffix">K</span></div>
+            <div class="stats-desc">YouTube Subscribers</div>
+          </article>
+          <article class="stats-card views reveal" data-target="5" data-suffix="M">
+            <div class="stats-number"><span class="counter">0</span><span class="suffix">M</span></div>
+            <div class="stats-desc">Total YouTube Views</div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section works" id="works" aria-labelledby="works-title">
+      <div class="section-label reveal">Works</div>
+      <div class="section-content">
+        <h2 id="works-title" class="reveal">Things to click, play, and watch.</h2>
+        <div class="filter-buttons reveal" aria-label="Filter works">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="roblox">Roblox Games</button>
+          <button class="filter-btn" data-filter="content">Content & Editing</button>
+        </div>
+        <div class="work-grid" id="work-grid">
+          <article class="work-card reveal" data-category="roblox">
+            <!-- Driving Simulator screenshot -->
+            <div class="work-image image-one" role="img" aria-label="Driving Simulator Roblox game screenshot showing a car on a driveway"></div>
+            <div class="work-body">
+              <h3>Driving Simulator</h3>
+              <p>A Roblox game project shaped around scripting-driven interaction and playful systems.</p>
+              <a class="button" href="https://www.roblox.com/games/14875626099/driving-simulator" target="_blank" rel="noreferrer">View</a>
+            </div>
+          </article>
+          <article class="work-card reveal" data-category="roblox">
+            <!-- Grow Your Leg screenshot -->
+            <div class="work-image image-two" role="img" aria-label="Grow Your Leg Roblox game screenshot showing a character with long legs in a snowy landscape"></div>
+            <div class="work-body">
+              <h3>Grow Your Leg</h3>
+              <p>A playful Roblox experience built around a memorable concept and quick progression.</p>
+              <a class="button" href="https://www.roblox.com/games/106419822021709/Grow-Your-Leg" target="_blank" rel="noreferrer">View</a>
+            </div>
+          </article>
+          <article class="work-card reveal" data-category="content">
+            <!-- YouTube profile picture/logo -->
+            <div class="work-image image-three" role="img" aria-label="YouTube channel @t.i1 avatar logo"></div>
+            <div class="work-body">
+              <h3>YouTube @t.i1</h3>
+              <p>Ahmed's YouTube channel for creator-led videos, edits, and content experiments.</p>
+              <a class="button" href="https://www.youtube.com/@t.i1" target="_blank" rel="noreferrer">View</a>
+            </div>
+          </article>
+        </div>
+        
+        <h3 class="featured-videos-title reveal" id="featured-videos-heading">Featured YouTube Videos</h3>
+        <div class="video-grid" id="video-grid">
+          <!-- Dynamically populated YouTube featured videos -->
+        </div>
+      </div>
+    </section>
+
+    <section class="section links" id="links" aria-labelledby="links-title">
+      <div class="section-label reveal">Links</div>
+      <div class="section-content reveal">
+        <h2 id="links-title">Find Ahmed online.</h2>
+        <div class="link-grid" id="link-grid">
+          <a class="link-button" href="https://www.youtube.com/@t.i1" target="_blank" rel="noreferrer">
+            <div class="link-content">
+              <i class="fa-brands fa-youtube" aria-hidden="true"></i>
+              <span>YouTube @t.i1</span>
+            </div>
+          </a>
+          <a class="link-button" href="https://discord.gg/H6T2DgzWFj" target="_blank" rel="noreferrer">
+            <div class="link-content">
+              <i class="fa-brands fa-discord" aria-hidden="true"></i>
+              <div>
+                <span>Discord</span>
+                <p class="link-username">@4pd_</p>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p><span id="footer-text">© 2026 Ahmed</span> · <button class="admin-login-trigger" id="admin-login-trigger" aria-label="Admin Access" type="button"><i class="fa-solid fa-lock"></i></button></p>
+  </footer>
+
+  <!-- Floating Admin Button -->
+  <button class="admin-fab" id="admin-fab" aria-label="Open Admin Dashboard" style="display: none;" type="button">
+    <i class="fa-solid fa-gear"></i>
+  </button>
+
+  <!-- Admin CMS Dashboard Modal -->
+  <div class="cms-modal" id="cms-modal" role="dialog" aria-labelledby="cms-modal-title" aria-hidden="true">
+    <div class="cms-modal-overlay" id="cms-modal-overlay"></div>
+    <div class="cms-modal-container">
+      <header class="cms-modal-header">
+        <h2 id="cms-modal-title">Admin Dashboard</h2>
+        <button class="cms-modal-close" id="cms-modal-close" aria-label="Close Dashboard" type="button">&times;</button>
+      </header>
+      
+      <div class="cms-modal-body">
+        <div class="cms-sidebar">
+          <button class="cms-tab-btn active" data-tab="general" type="button">Hero & Info</button>
+          <button class="cms-tab-btn" data-tab="about" type="button">About & Beliefs</button>
+          <button class="cms-tab-btn" data-tab="experience" type="button">Experience</button>
+          <button class="cms-tab-btn" data-tab="stats" type="button">Statistics</button>
+          <button class="cms-tab-btn" data-tab="works" type="button">Works</button>
+          <button class="cms-tab-btn" data-tab="links" type="button">Links</button>
+          <button class="cms-tab-btn" data-tab="videos" type="button">Videos</button>
+        </div>
+        
+        <div class="cms-content">
+          <form id="cms-form">
+            <!-- General & Hero Tab -->
+            <div class="cms-tab-content active" id="tab-general">
+              <h3>Hero & Site Info</h3>
+              <div class="form-group">
+                <label for="input-site-title">Owner Name</label>
+                <input type="text" id="input-site-title" name="siteTitle" required>
+              </div>
+              <div class="form-group">
+                <label for="input-hero-kicker">Hero Kicker</label>
+                <input type="text" id="input-hero-kicker" name="heroKicker">
+              </div>
+              <div class="form-group">
+                <label for="input-hero-tagline">Hero Tagline</label>
+                <textarea id="input-hero-tagline" name="heroTagline" rows="2"></textarea>
+              </div>
+              <div class="form-group">
+                <label for="input-hero-labels">Hero Labels (Comma separated)</label>
+                <input type="text" id="input-hero-labels" name="heroLabels">
+              </div>
+              <div class="form-group">
+                <label for="input-avatar-url">Avatar/Logo Path</label>
+                <input type="text" id="input-avatar-url" name="avatarUrl">
+              </div>
+              <div class="form-group">
+                <label for="input-portrait-caption">Portrait Card Caption</label>
+                <input type="text" id="input-portrait-caption" name="portraitCaption">
+              </div>
+              <h3>Hiring Status</h3>
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label for="input-hiring-status">Status Dot</label>
+                  <select id="input-hiring-status" name="hiringStatus">
+                    <option value="available">🟢 Available</option>
+                    <option value="busy">🔴 Busy</option>
+                    <option value="away">🟡 Away</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="input-hiring-text">Status Text</label>
+                  <input type="text" id="input-hiring-text" name="hiringStatusText">
+                </div>
+              </div>
+            </div>
+
+            <!-- About & Beliefs Tab -->
+            <div class="cms-tab-content" id="tab-about">
+              <h3>About Biography</h3>
+              <div class="form-group">
+                <label for="input-about-title">About Header</label>
+                <input type="text" id="input-about-title" name="aboutTitle">
+              </div>
+              <div class="form-group">
+                <label for="input-about-lead">Bio Lead Text (Large)</label>
+                <textarea id="input-about-lead" name="aboutLead" rows="3"></textarea>
+              </div>
+              <div class="form-group">
+                <label for="input-about-body">Bio Body Text</label>
+                <textarea id="input-about-body" name="aboutBody" rows="4"></textarea>
+              </div>
+              
+              <h3>Beliefs / How I work</h3>
+              <div class="beliefs-edit-list">
+                <!-- Belief 1 -->
+                <fieldset>
+                  <legend>Belief #1</legend>
+                  <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" name="belief1Title">
+                  </div>
+                  <div class="form-group">
+                    <label>Description</label>
+                    <textarea name="belief1Desc" rows="2"></textarea>
+                  </div>
+                </fieldset>
+                
+                <!-- Belief 2 -->
+                <fieldset>
+                  <legend>Belief #2</legend>
+                  <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" name="belief2Title">
+                  </div>
+                  <div class="form-group">
+                    <label>Description</label>
+                    <textarea name="belief2Desc" rows="2"></textarea>
+                  </div>
+                </fieldset>
+                
+                <!-- Belief 3 -->
+                <fieldset>
+                  <legend>Belief #3</legend>
+                  <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" name="belief3Title">
+                  </div>
+                  <div class="form-group">
+                    <label>Description</label>
+                    <textarea name="belief3Desc" rows="2"></textarea>
+                  </div>
+                </fieldset>
+              </div>
+            </div>
+
+            <!-- Experience Tab -->
+            <div class="cms-tab-content" id="tab-experience">
+              <div class="cms-section-header">
+                <h3>Experience Timeline</h3>
+                <button type="button" class="cms-add-btn" id="btn-add-experience">+ Add Role</button>
+              </div>
+              <div class="cms-list-editor" id="experience-list-editor">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+
+            <!-- Statistics Tab -->
+            <div class="cms-tab-content" id="tab-stats">
+              <h3>Numbers & Statistics</h3>
+              <div class="stats-edit-list">
+                <!-- Commission Stat -->
+                <fieldset>
+                  <legend>Commissions</legend>
+                  <div class="form-grid-2">
+                    <div class="form-group">
+                      <label>Target Number</label>
+                      <input type="text" name="statCommTarget">
+                    </div>
+                    <div class="form-group">
+                      <label>Suffix</label>
+                      <input type="text" name="statCommSuffix" placeholder="e.g. M, K">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label>Description</label>
+                    <input type="text" name="statCommDesc">
+                  </div>
+                </fieldset>
+
+                <!-- Visits Stat -->
+                <fieldset>
+                  <legend>Roblox Visits</legend>
+                  <div class="form-grid-2">
+                    <div class="form-group">
+                      <label>Target Number</label>
+                      <input type="text" name="statVisitsTarget">
+                    </div>
+                    <div class="form-group">
+                      <label>Suffix</label>
+                      <input type="text" name="statVisitsSuffix">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label>Description</label>
+                    <input type="text" name="statVisitsDesc">
+                  </div>
+                </fieldset>
+
+                <!-- Subscribers Stat -->
+                <fieldset>
+                  <legend>YouTube Subscribers</legend>
+                  <div class="form-grid-2">
+                    <div class="form-group">
+                      <label>Target Number</label>
+                      <input type="text" name="statSubsTarget">
+                    </div>
+                    <div class="form-group">
+                      <label>Suffix</label>
+                      <input type="text" name="statSubsSuffix">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label>Description</label>
+                    <input type="text" name="statSubsDesc">
+                  </div>
+                </fieldset>
+
+                <!-- Views Stat -->
+                <fieldset>
+                  <legend>YouTube Views</legend>
+                  <div class="form-grid-2">
+                    <div class="form-group">
+                      <label>Target Number</label>
+                      <input type="text" name="statViewsTarget">
+                    </div>
+                    <div class="form-group">
+                      <label>Suffix</label>
+                      <input type="text" name="statViewsSuffix">
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label>Description</label>
+                    <input type="text" name="statViewsDesc">
+                  </div>
+                </fieldset>
+              </div>
+            </div>
+
+            <!-- Works Tab -->
+            <div class="cms-tab-content" id="tab-works">
+              <div class="cms-section-header">
+                <h3>Works / Projects</h3>
+                <button type="button" class="cms-add-btn" id="btn-add-work">+ Add Project</button>
+              </div>
+              <div class="cms-list-editor" id="works-list-editor">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+
+            <!-- Links Tab -->
+            <div class="cms-tab-content" id="tab-links">
+              <div class="cms-section-header">
+                <h3>Social & External Links</h3>
+                <button type="button" class="cms-add-btn" id="btn-add-link">+ Add Link</button>
+              </div>
+              <div class="cms-list-editor" id="links-list-editor">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+
+            <!-- Videos Tab -->
+            <div class="cms-tab-content" id="tab-videos">
+              <h3>Featured YouTube Videos</h3>
+              <div class="videos-edit-list">
+                <fieldset>
+                  <legend>Video #1</legend>
+                  <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" name="vid1Title" required>
+                  </div>
+                  <div class="form-group">
+                    <label>YouTube Video ID</label>
+                    <input type="text" name="vid1Id" required>
+                  </div>
+                </fieldset>
+                <fieldset>
+                  <legend>Video #2</legend>
+                  <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" name="vid2Title" required>
+                  </div>
+                  <div class="form-group">
+                    <label>YouTube Video ID</label>
+                    <input type="text" name="vid2Id" required>
+                  </div>
+                </fieldset>
+                <fieldset>
+                  <legend>Video #3</legend>
+                  <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" name="vid3Title" required>
+                  </div>
+                  <div class="form-group">
+                    <label>YouTube Video ID</label>
+                    <input type="text" name="vid3Id" required>
+                  </div>
+                </fieldset>
+                <fieldset>
+                  <legend>Video #4</legend>
+                  <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" name="vid4Title" required>
+                  </div>
+                  <div class="form-group">
+                    <label>YouTube Video ID</label>
+                    <input type="text" name="vid4Id" required>
+                  </div>
+                </fieldset>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      
+      <footer class="cms-modal-footer">
+        <button class="cms-logout-btn" id="cms-logout-btn" type="button">Sign Out</button>
+        <button class="cms-save-btn" id="cms-save-btn" type="button">Save Changes</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Google Authentication Login Modal -->
+  <div class="cms-login-modal" id="cms-login-modal" role="dialog" aria-hidden="true">
+    <div class="cms-modal-overlay" id="cms-login-overlay"></div>
+    <div class="cms-modal-container login-container">
+      <header class="cms-modal-header">
+        <h2>Admin Authentication</h2>
+        <button class="cms-modal-close" id="cms-login-close" aria-label="Close Login Modal" type="button">&times;</button>
+      </header>
+      <div class="cms-modal-body login-body">
+        <p>Access is restricted to authorized accounts only.</p>
+        <div id="cms-auth-error" class="cms-auth-error" style="display: none;"></div>
+        <button class="google-signin-btn" id="google-signin-btn" type="button">
+          <i class="fa-brands fa-google"></i>
+          <span>Sign In with Google</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Video Lightbox Modal -->
+  <div class="lightbox-modal" id="lightbox-modal" role="dialog" aria-hidden="true">
+    <div class="lightbox-overlay" id="lightbox-overlay"></div>
+    <div class="lightbox-container">
+      <button class="lightbox-close" id="lightbox-close" aria-label="Close video player" type="button">&times;</button>
+      <div class="lightbox-video-wrapper">
+        <iframe id="lightbox-iframe" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vertical Code Editor Gutters (Sidebar elements) -->
+  <div class="editor-gutter left-gutter" aria-hidden="true">
+    <span>001</span>
+    <span>012</span>
+    <span>024</span>
+    <span>036</span>
+    <span>048</span>
+    <span>060</span>
+    <span>072</span>
+    <span>084</span>
+    <span>096</span>
+    <span>108</span>
+    <span>120</span>
+    <span>132</span>
+    <span>144</span>
+    <span>156</span>
+    <span>168</span>
+    <span>180</span>
+    <span>192</span>
+    <span>204</span>
+    <span>216</span>
+    <span>228</span>
+    <span>240</span>
+    <span>252</span>
+  </div>
+  <div class="editor-gutter right-gutter" aria-hidden="true">
+    <span>&lt;!-- body starts --&gt;</span>
+    <span>/* config loaded */</span>
+    <span>// running init_reveal()</span>
+    <span>const port = 5500;</span>
+    <span>&lt;main&gt;</span>
+    <span>&lt;section id="about"&gt;</span>
+    <span>&lt;section id="works"&gt;</span>
+    <span>// click_particle.init()</span>
+    <span>/* responsive = true */</span>
+    <span>&lt;footer&gt;</span>
+    <span>return ahmed;</span>
+  </div>
+
+  <!-- Draggable Retro Stickers in Margins -->
+  <div class="retro-stickers-container" aria-hidden="true">
+    <div class="draggable-sticker sticker-roblox">
+      <i class="fa-solid fa-cube"></i><span>ROBLOX</span>
+    </div>
+    <div class="draggable-sticker sticker-lua">
+      <i class="fa-solid fa-code"></i><span>print("Lua")</span>
+    </div>
+    <div class="draggable-sticker sticker-yt">
+      <i class="fa-brands fa-youtube"></i><span>YouTube</span>
+    </div>
+    <div class="draggable-sticker sticker-code">
+      <i class="fa-solid fa-file-code"></i><span>script.lua</span>
+    </div>
+    <div class="draggable-sticker sticker-coffee">
+      <i class="fa-solid fa-mug-hot"></i><span>Coffee</span>
+    </div>
+  </div>
+
+  <!-- Interactive Desktop Mascot (Mochi Bot) -->
+  <div class="desktop-mascot-container" id="desktop-mascot-container">
+    <div class="mascot-bubble" id="mascot-bubble">Hi! Click me!</div>
+    <div class="mascot-wrapper" id="mascot-wrapper" role="button" aria-label="Mascot companion">
+      <svg class="mascot-svg" width="80" height="90" viewBox="0 0 80 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Antenna -->
+        <rect class="mascot-antenna-shaft" x="38" y="15" width="4" height="15" fill="var(--ink)" />
+        <circle class="mascot-antenna-tip" cx="40" cy="12" r="5" fill="var(--orange)" stroke="var(--ink)" stroke-width="2.5" />
+        
+        <!-- Ears -->
+        <rect class="mascot-ear-left" x="6" y="38" width="6" height="16" rx="3" fill="var(--muted)" stroke="var(--ink)" stroke-width="2.5" />
+        <rect class="mascot-ear-right" x="68" y="38" width="6" height="16" rx="3" fill="var(--muted)" stroke="var(--ink)" stroke-width="2.5" />
+        
+        <!-- Head -->
+        <rect class="mascot-head" x="12" y="26" width="56" height="40" rx="10" fill="var(--paper)" stroke="var(--ink)" stroke-width="3" />
+        
+        <!-- Face/Screen -->
+        <rect class="mascot-screen" x="18" y="32" width="44" height="28" rx="6" fill="var(--ink)" />
+        
+        <!-- Eyes (Pupils targeted in JS) -->
+        <circle cx="28" cy="46" r="6" fill="#fff" />
+        <circle id="pupil-left" cx="28" cy="46" r="3.5" fill="var(--orange)" />
+        
+        <circle cx="52" cy="46" r="6" fill="#fff" />
+        <circle id="pupil-right" cx="52" cy="46" r="3.5" fill="var(--orange)" />
+
+        <!-- Mouth -->
+        <rect x="34" y="53" width="12" height="3.5" rx="1.75" fill="#fff" />
+        
+        <!-- Body -->
+        <rect class="mascot-body" x="22" y="66" width="36" height="20" rx="6" fill="var(--orange)" stroke="var(--ink)" stroke-width="3" />
+        <rect class="mascot-chest" x="28" y="71" width="24" height="10" rx="3" fill="var(--paper)" stroke="var(--ink)" stroke-width="2.5" />
+        <circle class="mascot-button" cx="40" cy="76" r="3.5" fill="var(--ink)" />
+      </svg>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
