@@ -89,9 +89,9 @@ function runPreloader() {
     updateProgress(90);
     await new Promise(r => setTimeout(r, 250));
 
-    // Start background interval for live refreshes (every 25 seconds for a true LIVE experience)
+    // Start background interval for live refreshes (every 5 seconds)
     if (robloxInterval) clearInterval(robloxInterval);
-    robloxInterval = setInterval(updateRobloxLiveStats, 25000);
+    robloxInterval = setInterval(updateRobloxLiveStats, 5000);
 
     // Final compile
     addLog("READY", "Ahmed portfolio compiled successfully!", "ready");
@@ -952,9 +952,7 @@ const KNOWN_ROBLOX_GAMES = {
 
 let resolvedUniverseCache = { ...KNOWN_ROBLOX_GAMES };
 let robloxInterval = null;
-let fluctuationInterval = null;
-let basePlayerCounts = {};
-let displayedPlayerCounts = {};
+let lastPlayerCounts = {};
 
 function extractPlaceId(url) {
   if (!url) return null;
@@ -1093,14 +1091,12 @@ function updateRobloxLiveStats() {
       const gameStats = stats[placeId];
       const playingCount = gameStats.playing;
       
-      basePlayerCounts[placeId] = playingCount;
-      
       const labelEl = document.getElementById(`roblox-live-players-${placeId}`);
       if (labelEl) {
-        const lastCount = displayedPlayerCounts[placeId] !== undefined ? displayedPlayerCounts[placeId] : 0;
+        const lastCount = lastPlayerCounts[placeId] || 0;
         if (lastCount !== playingCount) {
           animateValue(labelEl, lastCount, playingCount, 1000);
-          displayedPlayerCounts[placeId] = playingCount;
+          lastPlayerCounts[placeId] = playingCount;
         } else {
           labelEl.textContent = `${playingCount.toLocaleString()} playing`;
         }
@@ -1111,49 +1107,8 @@ function updateRobloxLiveStats() {
       }
     });
 
-    // Start the fluctuation loop in background
-    startFluctuationLoop();
-
     resolve(stats);
   });
-}
-
-// Micro-fluctuations loop: every 1.8 seconds, twitch the count slightly to make it look 100% "LIVE"
-function startFluctuationLoop() {
-  if (fluctuationInterval) return; // already running
-  
-  fluctuationInterval = setInterval(() => {
-    const data = currentPortfolioData;
-    if (!data || !data.works) return;
-
-    data.works.forEach(work => {
-      const placeId = extractPlaceId(work.url);
-      if (!placeId || basePlayerCounts[placeId] === undefined) return;
-
-      const baseVal = basePlayerCounts[placeId];
-      const currentVal = displayedPlayerCounts[placeId] !== undefined ? displayedPlayerCounts[placeId] : baseVal;
-
-      if (baseVal > 0) {
-        // Change between -2 and +2
-        const maxChange = Math.max(1, Math.floor(baseVal * 0.005));
-        const change = Math.floor(Math.random() * (maxChange * 2 + 1)) - maxChange;
-        
-        let newVal = currentVal + change;
-        
-        // Don't deviate more than 3% from the actual API baseline
-        const boundary = Math.max(2, Math.floor(baseVal * 0.03));
-        if (newVal < baseVal - boundary) newVal = baseVal - boundary;
-        if (newVal > baseVal + boundary) newVal = baseVal + boundary;
-        if (newVal < 0) newVal = 0;
-
-        const labelEl = document.getElementById(`roblox-live-players-${placeId}`);
-        if (labelEl && currentVal !== newVal) {
-          animateValue(labelEl, currentVal, newVal, 800);
-          displayedPlayerCounts[placeId] = newVal;
-        }
-      }
-    });
-  }, 1800);
 }
 
 // Database Write Logic
